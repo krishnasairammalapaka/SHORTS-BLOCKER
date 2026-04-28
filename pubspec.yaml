@@ -64,6 +64,7 @@ flutter:
 
   assets:
     - assets/logo.png
+    - assets/Shortsdetected.png
 
 flutter_icons:
   android: true

@@ -28,7 +28,12 @@ class HomeScreen extends StatelessWidget {
             builder: (context, enabled, _) {
               return _StatusStrip(
                 enabled: enabled,
-                onToggle: PlatformBridge.setBlockingEnabled,
+                onToggle: (value) async {
+                  final allowed = await _authorizeProtectionToggle(context);
+                  if (allowed) {
+                    await PlatformBridge.setBlockingEnabled(value);
+                  }
+                },
               );
             },
           ),
