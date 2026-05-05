@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,22 +45,11 @@ class AppLockController with WidgetsBindingObserver {
       return;
     }
 
-    final isSupported = await _auth.isDeviceSupported();
-    if (!isSupported) {
-      unlocked.value = true;
-      return;
-    }
-
     _authInProgress = true;
 
     try {
-      final didAuth = await _auth.authenticate(
-        localizedReason: 'Unlock Shorts Blocker',
-        options: const AuthenticationOptions(
-          biometricOnly: false,
-          stickyAuth: true,
-          useErrorDialogs: true,
-        ),
+      final didAuth = await authenticateDevice(
+        localizedReason: 'Unlock FocusLoop',
       );
       unlocked.value = didAuth;
     } catch (_) {
@@ -83,5 +71,23 @@ class AppLockController with WidgetsBindingObserver {
 
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+  }
+
+  Future<bool> authenticateDevice({
+    required String localizedReason,
+  }) async {
+    final isSupported = await _auth.isDeviceSupported();
+    if (!isSupported) {
+      return false;
+    }
+
+    return _auth.authenticate(
+      localizedReason: localizedReason,
+      options: const AuthenticationOptions(
+        biometricOnly: false,
+        stickyAuth: true,
+        useErrorDialogs: true,
+      ),
+    );
   }
 }

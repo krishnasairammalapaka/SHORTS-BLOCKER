@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Shorts Blocker</string>
+    <string name="app_name">FocusLoop</string>
     <string name="accessibility_service_description">Blocks YouTube Shorts by showing a short warning overlay and navigating back automatically.</string>
 </resources>

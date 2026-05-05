@@ -51,7 +51,7 @@ class StatsScreen extends StatelessWidget {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
-                  ?.copyWith(color: const Color(0xFF5A6772)),
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 8),
             ValueListenableBuilder<List<String>>(
@@ -92,8 +92,8 @@ class _StatsHero extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         gradient: LinearGradient(
           colors: [
-            colorScheme.primary.withOpacity(0.9),
-            colorScheme.secondary.withOpacity(0.85),
+            colorScheme.primary.withValues(alpha: 0.9),
+            colorScheme.secondary.withValues(alpha: 0.85),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -131,7 +131,7 @@ class _StatsHero extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.16),
+              color: Colors.white.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -170,6 +170,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -178,14 +179,14 @@ class _StatCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundColor: const Color(0xFFE6F2F1),
-              child: Icon(icon, color: const Color(0xFF0F6D6B)),
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.14),
+              child: Icon(icon, color: colorScheme.primary),
             ),
             const SizedBox(height: 12),
             Text(
               title,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF5A6772),
+                    color: colorScheme.onSurfaceVariant,
                   ),
             ),
             const SizedBox(height: 6),
@@ -209,6 +210,7 @@ class _LimitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       child: ListTile(
         leading: Container(
@@ -216,13 +218,13 @@ class _LimitCard extends StatelessWidget {
           width: 38,
           decoration: BoxDecoration(
             color: limitExceeded
-                ? const Color(0xFFFFE8E6)
-                : const Color(0xFFE9F4FF),
+                ? const Color(0xFFE96B63).withValues(alpha: 0.14)
+                : colorScheme.primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             limitExceeded ? Icons.lock_clock : Icons.timelapse_rounded,
-            color: limitExceeded ? const Color(0xFFE96B63) : Colors.blueGrey,
+            color: limitExceeded ? const Color(0xFFE96B63) : colorScheme.primary,
           ),
         ),
         title: const Text('Daily Limit'),
@@ -262,7 +264,7 @@ class _LogsCard extends StatelessWidget {
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium
-                          ?.copyWith(color: const Color(0xFF3D4852)),
+                          ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ),
                 ],
@@ -285,7 +287,10 @@ class _EmptyLogsCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            const Icon(Icons.info_outline, color: Color(0xFF5A6772)),
+            Icon(
+              Icons.info_outline,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -293,7 +298,7 @@ class _EmptyLogsCard extends StatelessWidget {
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
-                    ?.copyWith(color: const Color(0xFF5A6772)),
+                    ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             ),
           ],

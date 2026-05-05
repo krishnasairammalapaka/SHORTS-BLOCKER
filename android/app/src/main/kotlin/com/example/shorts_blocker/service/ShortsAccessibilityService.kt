@@ -20,9 +20,6 @@ class ShortsAccessibilityService : AccessibilityService() {
     @Volatile
     private var blockInProgress = false
     private var lastBlockTimestamp = 0L
-    private var lastRedirectTimestamp = 0L
-    private var lastWasShorts = false
-    private var nextBlockAllowedAt = 0L
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -54,8 +51,6 @@ class ShortsAccessibilityService : AccessibilityService() {
 
         val now = System.currentTimeMillis()
         if (now - lastBlockTimestamp < BLOCK_DEBOUNCE_MS) return
-        if (now - lastRedirectTimestamp < REDIRECT_COOLDOWN_MS) return
-        if (now < nextBlockAllowedAt) return
 
         val eventNode = event.source
         val rootNode = rootInActiveWindow
@@ -64,24 +59,14 @@ class ShortsAccessibilityService : AccessibilityService() {
         collectShortsSignals(eventNode, 0, signals)
         collectShortsSignals(rootNode, 0, signals)
 
-        val isShortsScreen = isShortsFromEvent(event) ||
-            signals.url ||
-            signals.player ||
-            (signals.keyword && signals.reelViewId)
+        // Avoid triggering on the Home feed Shorts shelf; require player or URL signals.
+        val isShortsScreen = signals.url || signals.player
 
         val reason = resolveBlockReason(event, signals)
 
         eventNode?.recycle()
 
-        if (!isShortsScreen) {
-            lastWasShorts = false
-            return
-        }
-
-        if (lastWasShorts) {
-            return
-        }
-        lastWasShorts = true
+        if (!isShortsScreen) return
 
         Log.d(TAG, "Shorts detected, triggering blocking flow")
 
@@ -101,8 +86,6 @@ class ShortsAccessibilityService : AccessibilityService() {
         if (blockInProgress) return
         blockInProgress = true
         lastBlockTimestamp = System.currentTimeMillis()
-        lastRedirectTimestamp = lastBlockTimestamp
-        nextBlockAllowedAt = lastBlockTimestamp + MIN_BLOCK_INTERVAL_MS
 
         val attempts = ShortsStatsStore.incrementAttempt(this)
         ShortsStatsStore.incrementBlock(this)
@@ -120,8 +103,6 @@ class ShortsAccessibilityService : AccessibilityService() {
             )
             mainHandler.postDelayed({
                 openYouTubeHome()
-                lastRedirectTimestamp = System.currentTimeMillis()
-                lastWasShorts = false
                 overlayManager.dismiss()
                 blockInProgress = false
             }, NORMAL_FLOW_DELAY_MS)
@@ -136,8 +117,6 @@ class ShortsAccessibilityService : AccessibilityService() {
 
         mainHandler.postDelayed({
             openYouTubeHome()
-            lastRedirectTimestamp = System.currentTimeMillis()
-            lastWasShorts = false
             overlayManager.dismiss()
             blockInProgress = false
         }, NORMAL_FLOW_DELAY_MS)
@@ -180,15 +159,8 @@ class ShortsAccessibilityService : AccessibilityService() {
             return true
         }
 
-        for (entry in event.text) {
-            val value = entry?.toString()?.lowercase(Locale.US) ?: continue
-            if (containsShortsKeyword(value)) {
-                return true
-            }
-        }
-
         val description = event.contentDescription?.toString()?.lowercase(Locale.US).orEmpty()
-        if (containsShortsKeyword(description)) {
+        if (description.contains("/shorts/") || containsShortsKeyword(description)) {
             return true
         }
 
@@ -253,17 +225,12 @@ class ShortsAccessibilityService : AccessibilityService() {
         private const val TAG = "ShortsBlockerService"
         private const val YOUTUBE_PACKAGE = "com.google.android.youtube"
         private const val DAILY_LIMIT = 5
-        private const val NORMAL_FLOW_DELAY_MS = 3_000L
-        private const val INSTANT_FLOW_OVERLAY_MS = 3_000L
+        private const val NORMAL_FLOW_DELAY_MS = 1_000L
+        private const val INSTANT_FLOW_OVERLAY_MS = 1_000L
         private const val BLOCK_DEBOUNCE_MS = 1_200L
-        private const val REDIRECT_COOLDOWN_MS = 8_000L
-        private const val MIN_BLOCK_INTERVAL_MS = 12_000L
         private const val MAX_NODE_DEPTH = 80
         private val SHORTS_KEYWORDS = listOf(
             "shorts",
-            "short",
-            "reel",
-            "reels",
         )
         private val SHORTS_PLAYER_VIEW_ID_TOKENS = listOf(
             "reel_player",

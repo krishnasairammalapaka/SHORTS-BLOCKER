@@ -63,15 +63,16 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/logo.png
+    - assets/focusloop.png
     - assets/Shortsdetected.png
 
 flutter_icons:
   android: true
   ios: false
-  image_path: assets/logo.png
+  image_path: assets/focusloop.png
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: assets/logo.png
+  adaptive_icon_foreground: assets/focusloop.png
+  adaptive_icon_foreground_inset: 36
 
   # To add assets to your application, add an assets section, like this:
   # assets:

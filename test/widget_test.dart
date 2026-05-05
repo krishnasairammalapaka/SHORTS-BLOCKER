@@ -46,7 +46,7 @@ void main() {
     await tester.pumpWidget(const ShortsBlockerApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Shorts Blocker'), findsWidgets);
+    expect(find.text('FocusLoop'), findsWidgets);
     expect(find.text('Enable Shorts Blocking'), findsOneWidget);
 
     await tester.tap(find.text('Stats'));

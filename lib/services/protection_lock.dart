@@ -7,6 +7,7 @@ class ProtectionLock {
   ProtectionLock._();
 
   static const String _keyHash = 'protection_lock_hash';
+  static const int pinLength = 4;
 
   static Future<bool> isSet() async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,6 +27,13 @@ class ProtectionLock {
       return false;
     }
     return storedHash == _hash(password);
+  }
+
+  static bool isValidPin(String value) {
+    if (value.length != pinLength) {
+      return false;
+    }
+    return RegExp(r'^\d+$').hasMatch(value);
   }
 
   static String _hash(String value) {
